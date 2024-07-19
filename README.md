@@ -19,6 +19,5 @@ ByteBuffer byteSegment = arena.allocate(100,Byte.TYPE.getName());
 
 ## Acknowledgements
 
-I would like to acknowledge and thank Michael Yarichuk for inspiring this project and providing the initial mission that led to its creation.
-
+Big thanks to Michael Yarichuk for inspiring me to create this project and giving me the initial mission to get started!
 - [Michael Yarichuk](https://github.com/myarichuk)
