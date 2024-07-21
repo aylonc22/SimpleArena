@@ -39,14 +39,21 @@ public class Arena implements AutoCloseable {
      * Allocate memory segment from Arena's pre-allocated block.
      *
      * @param amountOfTs Size of the segment to allocate (in bytes)
-     * @return true if allocation succeeded, false otherwise
+     * @return {@code AllocationResult<True,Segment>} if allocation succeeded, {@code AllocationResult<False,null>} otherwise
      */
-    public <T>boolean tryAllocate(int amountOfTs,T type) {
+    public <T>AllocationResult tryAllocate(int amountOfTs,int startOffset,T type) {
         if (isDisposed)
             throw new IllegalStateException("Arena has been disposed.");
 
         int allocationSize = amountOfTs * sizeOf(type);
-        return allocationSize + allocatedBytes <= totalBytes;
+        if(allocationSize + startOffset <= allocatedBytes){
+            ByteBuffer segment = memoryBlock.duplicate();
+            segment.position(startOffset);
+            segment.limit(allocationSize);
+
+            return new AllocationResult(true,segment);
+        }
+        return new AllocationResult(false,null);
     }
 
     /**

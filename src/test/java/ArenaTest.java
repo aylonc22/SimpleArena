@@ -51,17 +51,44 @@ public class ArenaTest {
     }
 
     @Test
-    public void Should_fail_to_tryallocate_beyond_size()
+    public void should_fail_to_tryallocate_beyond_size()
     {
-       try(var arena = new Arena(1025)){
+       try(var arena = new Arena(1024)){
            var segment1 = arena.allocate(1000,Byte.class);
            var segment2 = arena.allocate(24,Byte.class);
-           assertTrue(arena.tryAllocate(1,Byte.class));
+            assertFalse(arena.tryAllocate(1,1024,Byte.class).isSuccess());
        }
-
-
     }
+    @Test
+    public void should_success_to_tryallocate_inside_size()
+    {
+        try(var arena = new Arena(1024)){
+            var segment1 = arena.allocate(1000,Byte.class);
+            var segment2 = arena.allocate(24,Byte.class);
+            assertTrue(arena.tryAllocate(1,1023,Byte.class).isSuccess());
+        }
+    }
+    @Test
+    public void should_get_allocated_buffer_arguments_when_reallocating(){
+        try(var arena = new Arena(1)){
+            var segment1 = arena.allocate(1,Byte.class);
+            segment1.put(0, (byte) 1);
+            var segment2 = arena.tryAllocate(1,0,Byte.class).getBuffer();
+            assertEquals(1,segment2.get(0));
+        }
+    }
+    @Test
+    public void should_change_allocated_buffer_arguments_when_reallocating(){
+        try(var arena = new Arena(1)){
+            var segment1 = arena.allocate(1,Byte.class);
+            segment1.put(0, (byte) 1);
+            var segment2 = arena.tryAllocate(1,0,Byte.class).getBuffer();
+            segment2.put(0,(byte) 0);
+            var segment3 = arena.tryAllocate(1,0,Byte.class).getBuffer();
+            assertEquals(0,segment3.get(0));
 
+        }
+    }
     @Test
     public void reset_should_increment_ResetCount()
     {
