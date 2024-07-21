@@ -71,4 +71,13 @@ public class ArenaTest {
         assertEquals(2, arena.getResetCount());
     }
 }
+    @Test
+    public void should_remember_his_position_in_the_byteBuffer(){
+        try(var arena = new Arena(1024)) {
+               var segment1 = arena.allocate(100,Byte.class);
+               var segment2 = arena.allocate(100,Byte.class);
+               assertEquals(100,segment2.position());
+
+        }
+    }
 }
